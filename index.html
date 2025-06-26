@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>THE Memecoin – Friendly Café Vibes</title>
+  <!-- Friendly Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* Reset & Base */
+    * { margin:0; padding:0; box-sizing:border-box }
+    html, body { width:100%; height:100%; overflow:hidden }
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #f0e3d7, #ffeedd);
+      position: relative;
+    }
+
+    /* Hero Container */
+    .hero {
+      position: relative;
+      width:100vw; height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      color:#3a3a3a;
+      padding:0 1rem;
+    }
+    .hero h1 {
+      font-size:12vw;
+      line-height:1;
+      letter-spacing:0.5vw;
+    }
+    .hero .motto {
+      margin-top:0.5em;
+      font-size:1.5rem;
+      font-weight:400;
+    }
+
+    /* Bubble Container */
+    #bubble-container {
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      pointer-events:none;
+    }
+
+    /* Speech Bubble Style */
+    .bubble {
+      position:absolute;
+      background:#fff;
+      color:#333;
+      padding:0.6em 1em;
+      border-radius:1em;
+      box-shadow:0 4px 8px rgba(0,0,0,0.1);
+      font-size:1rem;
+      opacity:0;
+      transform:translateY(10px) scale(0.9);
+      animation:bubbleAnim 4s ease-in-out forwards;
+      white-space:nowrap;
+    }
+    .bubble::after {
+      content:"";
+      position:absolute;
+      bottom:-8px;
+      left:20px;
+      border-width:8px 8px 0;
+      border-style:solid;
+      border-color:#fff transparent;
+    }
+
+    @keyframes bubbleAnim {
+      0%   { opacity:0; transform:translateY(20px) scale(0.8) }
+      10%  { opacity:1; transform:translateY(0)    scale(1)   }
+      80%  { opacity:1; transform:translateY(-10px) scale(1)  }
+      100% { opacity:0; transform:translateY(-20px) scale(0.8) }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>THE</h1>
+    <div class="motto">Spread THE Word</div>
+    <div id="bubble-container"></div>
+  </div>
+
+  <script>
+    const phrases = [
+      "THE coin might moon...",
+      "I love THE coin",
+      "THE",
+      "spread THE word",
+      "All roads lead to THE",
+      "Buy THE coin, HODL THE coin",
+      "THE most used word",
+      "Did someone say THE?",
+      "Proof: THE",
+      "Shill THE coin",
+      "My cat only responds to THE",
+      "I whispered THE in my sleep last night",
+      "Make every day a THE day",
+      "life's best filler word",
+      "If lost, follow THE echo",
+      "I’m fluent in THE",
+      "They call me the THE whisperer",
+      "Every story needs a little THE",
+      "Trust in THE token",
+      "I came, I saw, I said THE"
+    ];
+    const container = document.getElementById('bubble-container');
+    const heroText = document.querySelector('.hero h1');
+    const mottoText = document.querySelector('.hero .motto');
+
+    function spawnBubble() {
+      // Create bubble
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+      container.appendChild(bubble);
+
+      // Dimensions of new bubble
+      const bRect = bubble.getBoundingClientRect();
+      const bw = bRect.width, bh = bRect.height;
+
+      // Central region to avoid (h1 + motto)
+      const hRect = heroText.getBoundingClientRect();
+      const mRect = mottoText.getBoundingClientRect();
+      const region = {
+        left:   Math.min(hRect.left, mRect.left),
+        right:  Math.max(hRect.right, mRect.right),
+        top:    Math.min(hRect.top, mRect.top),
+        bottom: Math.max(hRect.bottom, mRect.bottom)
+      };
+
+      // Check against existing bubbles
+      const others = Array.from(container.getElementsByClassName('bubble'))
+                          .filter(b => b !== bubble);
+
+      // Find a valid position
+      let x, y, valid = false, attempts = 0;
+      while (!valid && attempts < 50) {
+        attempts++;
+        x = Math.random() * (window.innerWidth - bw);
+        y = Math.random() * (window.innerHeight - bh);
+
+        // Avoid central region
+        if (x < region.right && x + bw > region.left &&
+            y < region.bottom && y + bh > region.top) {
+          continue;
+        }
+        // Avoid overlapping other bubbles
+        let overlap = false;
+        for (const other of others) {
+          const o = other.getBoundingClientRect();
+          if (x < o.right && x + bw > o.left &&
+              y < o.bottom && y + bh > o.top) {
+            overlap = true;
+            break;
+          }
+        }
+        if (!overlap) valid = true;
+      }
+
+      bubble.style.left = `${x}px`;
+      bubble.style.top  = `${y}px`;
+
+      // Remove after animation
+      bubble.addEventListener('animationend', () => bubble.remove());
+    }
+
+    // Spawn one bubble every 1.25 seconds
+    setInterval(spawnBubble, 1500);
+  </script>
+
+</body>
+</html>
